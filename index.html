@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meta Ads Report — Budowlanka Q4 2024</title>
+  <title>Meta Ads Report — Natalia Przybylska 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -15,8 +15,18 @@
       --cyan:#00e0ff; --purple:#a855f7; --green:#22d3a0; --amber:#f59e0b; --rose:#f43f5e;
       --text:#e2e8f2; --muted:rgba(226,232,242,.45); --muted2:rgba(226,232,242,.2);
     }
+    body.light {
+      --bg:#f0f4f8; --surface:#e2e8f0; --card:#ffffff; --card-hi:#f8fafc;
+      --border:rgba(0,0,0,.09); --border-hi:rgba(0,160,200,.35);
+      --cyan:#0093b8; --purple:#7c3aed; --green:#059669; --amber:#d97706; --rose:#e11d48;
+      --text:#0f172a; --muted:rgba(15,23,42,.5); --muted2:rgba(15,23,42,.28);
+    }
+    body.light .gb { opacity:.18; filter:blur(90px) saturate(1.5); }
+    body.light .kpi-track { background:rgba(0,0,0,.07); }
+    body.light table tbody tr:hover { background:rgba(0,147,184,.04); }
+    body.light .tfoot,.body.light .insight { background:rgba(0,0,0,.03); }
     html { scroll-behavior:smooth; }
-    body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; transition:background .35s,color .35s; }
     ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--surface)} ::-webkit-scrollbar-thumb{background:rgba(0,224,255,.25);border-radius:3px}
 
     /* noise */
@@ -54,6 +64,13 @@
     .chip.on{background:rgba(0,224,255,.1);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,224,255,.12)}
     .badge-live{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--muted)}
     .ldot-live{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:dot 2.4s ease-in-out infinite}
+    /* mode toggle */
+    .mode-toggle{display:flex;align-items:center;gap:10px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--muted);cursor:pointer;user-select:none;transition:all .2s}
+    .mode-toggle:hover{border-color:rgba(0,224,255,.25);color:var(--text)}
+    .toggle-track{width:34px;height:18px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid var(--border);position:relative;transition:background .3s}
+    .toggle-track.on{background:rgba(0,224,255,.25);border-color:var(--cyan)}
+    .toggle-thumb{width:12px;height:12px;border-radius:50%;background:var(--muted);position:absolute;top:2px;left:2px;transition:left .25s,background .25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+    .toggle-track.on .toggle-thumb{left:18px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
 
     /* section label */
     .slabel{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px}
@@ -65,7 +82,7 @@
     .kpi{padding:20px;position:relative;overflow:hidden}
     .kpi::after{content:attr(data-icon);position:absolute;right:-2px;bottom:-8px;font-size:54px;opacity:.04;pointer-events:none;line-height:1}
     .kpi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
-    .kpi-val{font-family:'Work sans',sans-serif;font-size:26px; font-weight: 600; letter-spacing:-.03em;color:var(--text);margin-bottom:10px;line-height:1}
+    .kpi-val{font-family:'Syne',sans-serif;font-size:26px;letter-spacing:-.03em;color:var(--text);margin-bottom:10px;line-height:1}
     .kpi-track{height:2px;background:rgba(255,255,255,.06);border-radius:99px;margin-bottom:7px}
     .kpi-fill{height:2px;border-radius:99px;animation:bar 1.2s ease both}
     .kpi-sub{font-size:11px;font-weight:600}
@@ -149,14 +166,14 @@
         <div class="brand-icon">🏗️</div>
         <div>
           <div class="brand-name">Meta Ads <span>Analytics</span></div>
-          <div class="brand-sub">Kampanie budowlane · Q4 2024</div>
+          <div class="brand-sub">Kampanie - branża budowlana · 10 kreacji · Q1 2026</div>
         </div>
       </div>
       <div class="topbar-r">
-        <button class="chip" onclick="setPeriod(this)">7d</button>
-        <button class="chip on" onclick="setPeriod(this)">30d</button>
-        <button class="chip" onclick="setPeriod(this)">90d</button>
-        <div class="badge-live"><span class="ldot-live"></span>Night mode</div>
+        <div class="mode-toggle" onclick="toggleMode()">
+          <div class="toggle-track on" id="toggleTrack"><div class="toggle-thumb"></div></div>
+          <span id="modeLabel">Night mode</span>
+        </div>
       </div>
     </header>
 
@@ -238,7 +255,7 @@
     </div>
 
     <div class="div u6"></div>
-    <footer class="footer u6">Meta Ads Analytics · Budowlanka · Q4 2024 · Wygenerowano przez Claude AI</footer>
+    <footer class="footer u6">Meta Ads Analytics · Natalia Przybylska · 2026</footer>
   </main>
 
 <script>
@@ -291,7 +308,7 @@ const lArr=D.map(d=>d.leads);
 const aCtx=document.getElementById('aC').getContext('2d');
 const gC=aCtx.createLinearGradient(0,0,0,220);gC.addColorStop(0,'rgba(0,224,255,.28)');gC.addColorStop(1,'rgba(0,224,255,0)');
 const gP=aCtx.createLinearGradient(0,0,0,220);gP.addColorStop(0,'rgba(168,85,247,.28)');gP.addColorStop(1,'rgba(168,85,247,0)');
-const aC=new Chart(aCtx,{type:'line',data:{labels:aLbls,datasets:[{data:sAcc,borderColor:'#00e0ff',borderWidth:2.5,backgroundColor:gC,fill:true,tension:.4,pointBackgroundColor:'#00e0ff',pointRadius:3,pointHoverRadius:7,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks,border:{display:false}},y:{grid,ticks,border:{display:false}}},plugins:{tooltip:{...tip,callbacks:{label:c=>' '+fmt(c.parsed.y,c.parsed.y<100?2:0)+' PLN'}}}}});
+const aC=window._aC=new Chart(aCtx,{type:'line',data:{labels:aLbls,datasets:[{data:sAcc,borderColor:'#00e0ff',borderWidth:2.5,backgroundColor:gC,fill:true,tension:.4,pointBackgroundColor:'#00e0ff',pointRadius:3,pointHoverRadius:7,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks,border:{display:false}},y:{grid,ticks,border:{display:false}}},plugins:{tooltip:{...tip,callbacks:{label:c=>' '+fmt(c.parsed.y,c.parsed.y<100?2:0)+' PLN'}}}}});
 
 function switchTab(t){
   document.getElementById('ts').className='tab '+(t==='spend'?'on':'');
@@ -302,10 +319,10 @@ function switchTab(t){
 }
 
 // Bar
-new Chart(document.getElementById('bC').getContext('2d'),{type:'bar',data:{labels:D.map(d=>d.ad.length>13?d.ad.slice(0,12)+'…':d.ad),datasets:[{label:'Leady',data:D.map(d=>d.leads),backgroundColor:NEON.map(c=>c+'cc'),borderRadius:5,yAxisID:'y'},{label:'CPL (PLN)',data:D.map(d=>d.cpl),backgroundColor:'rgba(168,85,247,.22)',borderColor:'rgba(168,85,247,.5)',borderWidth:1,borderRadius:5,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,maxRotation:40,font:{size:9}},border:{display:false}},y:{grid,ticks,border:{display:false},position:'left'},y1:{grid:{display:false},ticks,border:{display:false},position:'right'}},plugins:{legend:{display:true,labels:{color:'rgba(226,232,242,.4)',font:{size:11},boxWidth:12,padding:16}},tooltip:tip}}});
+window._bC=new Chart(document.getElementById('bC').getContext('2d'),{type:'bar',data:{labels:D.map(d=>d.ad.length>13?d.ad.slice(0,12)+'…':d.ad),datasets:[{label:'Leady',data:D.map(d=>d.leads),backgroundColor:NEON.map(c=>c+'cc'),borderRadius:5,yAxisID:'y'},{label:'CPL (PLN)',data:D.map(d=>d.cpl),backgroundColor:'rgba(168,85,247,.22)',borderColor:'rgba(168,85,247,.5)',borderWidth:1,borderRadius:5,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,maxRotation:40,font:{size:9}},border:{display:false}},y:{grid,ticks,border:{display:false},position:'left'},y1:{grid:{display:false},ticks,border:{display:false},position:'right'}},plugins:{legend:{display:true,labels:{color:'rgba(226,232,242,.4)',font:{size:11},boxWidth:12,padding:16}},tooltip:tip}}});
 
 // Bubble
-new Chart(document.getElementById('bbC').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Kreacje',data:D.map((d,i)=>({x:d.reach,y:d.clicks,r:Math.sqrt(d.leads)*4.2,ad:d.ad,leads:d.leads})),backgroundColor:D.map((_,i)=>NEON[i]+'50'),borderColor:D.map((_,i)=>NEON[i]),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,callback:v=>`${(v/1000).toFixed(0)}k`},border:{display:false},title:{display:true,text:'Zasięg',color:'rgba(226,232,242,.3)',font:{size:10}}},y:{grid,ticks,border:{display:false},title:{display:true,text:'Kliknięcia',color:'rgba(226,232,242,.3)',font:{size:10}}}},plugins:{tooltip:{...tip,callbacks:{title:i=>i[0].raw.ad,label:i=>[` Zasięg: ${fmt(i.raw.x)}`,` Kliknięcia: ${fmt(i.raw.y)}`,` Leady: ${i.raw.leads}`]}}}}});
+window._bbC=new Chart(document.getElementById('bbC').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Kreacje',data:D.map((d,i)=>({x:d.reach,y:d.clicks,r:Math.sqrt(d.leads)*4.2,ad:d.ad,leads:d.leads})),backgroundColor:D.map((_,i)=>NEON[i]+'50'),borderColor:D.map((_,i)=>NEON[i]),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,callback:v=>`${(v/1000).toFixed(0)}k`},border:{display:false},title:{display:true,text:'Zasięg',color:'rgba(226,232,242,.3)',font:{size:10}}},y:{grid,ticks,border:{display:false},title:{display:true,text:'Kliknięcia',color:'rgba(226,232,242,.3)',font:{size:10}}}},plugins:{tooltip:{...tip,callbacks:{title:i=>i[0].raw.ad,label:i=>[` Zasięg: ${fmt(i.raw.x)}`,` Kliknięcia: ${fmt(i.raw.y)}`,` Leady: ${i.raw.leads}`]}}}}});
 
 // Table
 let sK='cpl',sD='asc';
@@ -334,7 +351,30 @@ function renderT(){
 }
 renderT();
 
-function setPeriod(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+// Night / Day mode toggle
+let isNight = true;
+function toggleMode() {
+  isNight = !isNight;
+  document.body.classList.toggle('light', !isNight);
+  const track = document.getElementById('toggleTrack');
+  const label = document.getElementById('modeLabel');
+  track.classList.toggle('on', isNight);
+  label.textContent = isNight ? 'Night mode' : 'Day mode';
+  // update chart grid & tick colors
+  const gridColor  = isNight ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
+  const tickColor  = isNight ? 'rgba(226,232,242,.3)'  : 'rgba(15,23,42,.35)';
+  const titleColor = isNight ? 'rgba(226,232,242,.3)'  : 'rgba(15,23,42,.35)';
+  [window._aC, window._bC, window._bbC].forEach(ch => {
+    if(!ch) return;
+    ch.options.scales && Object.values(ch.options.scales).forEach(ax => {
+      if(ax.grid)  ax.grid.color  = gridColor;
+      if(ax.ticks) ax.ticks.color = tickColor;
+      if(ax.title) ax.title.color = titleColor;
+    });
+    ch.update();
+  });
+}
+
 </script>
 </body>
 </html>

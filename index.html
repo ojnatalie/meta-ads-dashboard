@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meta Ads Report — Budowlanka Q4 2024</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#07090f; --surface:#0e1118; --card:#131722; --card-hi:#181d2a;
+      --border:rgba(255,255,255,.07); --border-hi:rgba(0,224,255,.3);
+      --cyan:#00e0ff; --purple:#a855f7; --green:#22d3a0; --amber:#f59e0b; --rose:#f43f5e;
+      --text:#e2e8f2; --muted:rgba(226,232,242,.45); --muted2:rgba(226,232,242,.2);
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--surface)} ::-webkit-scrollbar-thumb{background:rgba(0,224,255,.25);border-radius:3px}
+
+    /* noise */
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px}
+
+    /* glows */
+    .gb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);}
+    .gb1{width:600px;height:600px;top:-220px;left:-180px;background:radial-gradient(circle,rgba(0,224,255,.07),transparent 70%);}
+    .gb2{width:700px;height:700px;bottom:-300px;right:-200px;background:radial-gradient(circle,rgba(168,85,247,.06),transparent 70%);}
+
+    @keyframes up  {from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes bar {from{width:0}}
+    @keyframes dot {0%,100%{opacity:1}50%{opacity:.25}}
+    .u1{animation:up .5s ease .04s both} .u2{animation:up .5s ease .1s both} .u3{animation:up .5s ease .16s both}
+    .u4{animation:up .5s ease .22s both} .u5{animation:up .5s ease .28s both} .u6{animation:up .5s ease .34s both}
+
+    /* layout */
+    .page{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:32px 28px 60px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;transition:border-color .25s,box-shadow .25s,background .2s}
+    .card:hover{background:var(--card-hi)}
+    .hc:hover{border-color:rgba(0,224,255,.26);box-shadow:0 0 32px rgba(0,224,255,.06)}
+    .hp:hover{border-color:rgba(168,85,247,.26);box-shadow:0 0 32px rgba(168,85,247,.06)}
+    .p20{padding:20px 22px} .p24{padding:22px 24px}
+
+    /* topbar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:36px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(0,224,255,.18),rgba(168,85,247,.18));border:1px solid var(--border-hi);display:grid;place-items:center;font-size:22px;box-shadow:0 0 24px rgba(0,224,255,.18)}
+    .brand-name{font-family:'Syne',sans-serif;font-size:20px;letter-spacing:-.02em}
+    .brand-name span{background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
+    .topbar-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .chip{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all .2s}
+    .chip:hover{color:var(--text);border-color:rgba(255,255,255,.15)}
+    .chip.on{background:rgba(0,224,255,.1);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,224,255,.12)}
+    .badge-live{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--muted)}
+    .ldot-live{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:dot 2.4s ease-in-out infinite}
+
+    /* section label */
+    .slabel{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px}
+
+    /* kpi */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+    @media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    .kpi{padding:20px;position:relative;overflow:hidden}
+    .kpi::after{content:attr(data-icon);position:absolute;right:-2px;bottom:-8px;font-size:54px;opacity:.04;pointer-events:none;line-height:1}
+    .kpi-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+    .kpi-val{font-family:'Work sans',sans-serif;font-size:26px; font-weight: 600; letter-spacing:-.03em;color:var(--text);margin-bottom:10px;line-height:1}
+    .kpi-track{height:2px;background:rgba(255,255,255,.06);border-radius:99px;margin-bottom:7px}
+    .kpi-fill{height:2px;border-radius:99px;animation:bar 1.2s ease both}
+    .kpi-sub{font-size:11px;font-weight:600}
+
+    /* grid rows */
+    .g2{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:16px}
+    .g11{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:900px){.g2,.g11{grid-template-columns:1fr}}
+
+    /* card header */
+    .ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+    .ch-t{font-family:'Syne',sans-serif;font-size:15px;letter-spacing:-.01em}
+    .ch-s{font-size:11px;color:var(--muted);margin-top:3px}
+
+    /* tabs */
+    .tabs{display:flex;gap:6px}
+    .tab{padding:4px 12px;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s}
+    .tab.on{background:rgba(0,224,255,.1);color:var(--cyan);border-color:var(--cyan)}
+    .tab:hover:not(.on){color:var(--text)}
+
+    /* chart */
+    .cbox{position:relative;height:220px}
+    .cbox2{position:relative;height:236px}
+    .chart-surf{background:linear-gradient(to bottom,rgba(0,224,255,.025),transparent);border-top:1px solid rgba(0,224,255,.08);border-radius:10px;padding:8px 0 0}
+
+    /* feed */
+    .fi{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .fi:last-of-type{border-bottom:none}
+    .fi-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;animation:dot 2.5s ease-in-out infinite}
+    .fi-t{font-size:13px;font-weight:600;color:var(--text)}
+    .fi-s{font-size:11px;color:var(--muted);margin-top:2px}
+    .insight{margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(0,224,255,.07),rgba(168,85,247,.07));border:1px solid rgba(0,224,255,.18);border-radius:12px}
+    .insight-t{font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:5px}
+    .insight-s{font-size:11px;color:var(--muted);line-height:1.6}
+
+    /* table */
+    .tw{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    thead tr{border-bottom:1px solid var(--border)}
+    th{padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--muted2);white-space:nowrap}
+    th.s{cursor:pointer;user-select:none;transition:color .15s}
+    th.s:hover,th.on{color:var(--cyan)!important}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:rgba(0,224,255,.025)}
+    td{padding:11px 12px}
+    .tag{display:inline-block;background:rgba(0,224,255,.06);color:var(--cyan);border:1px solid rgba(0,224,255,.16);border-radius:6px;padding:2px 9px;font-size:10px;font-family:'DM Mono',monospace;white-space:nowrap}
+    .pill{display:inline-block;border-radius:6px;padding:3px 10px;font-weight:700;font-size:12px;font-family:'DM Mono',monospace}
+    .mono{font-family:'DM Mono',monospace}
+
+    /* tfoot */
+    .tfoot{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding:12px 16px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid var(--border);flex-wrap:wrap;gap:14px}
+    .tfoot-a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+    .adot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green)}
+    .atime{color:var(--green);font-family:'DM Mono',monospace;font-weight:700}
+    .tstats{display:flex;gap:28px;flex-wrap:wrap}
+    .ts-lbl{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+    .ts-val{font-size:12px;font-weight:700;font-family:'DM Mono',monospace}
+
+    /* legend */
+    .legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .ld{width:7px;height:7px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px}
+    .legend span{font-size:11px;color:var(--muted)}
+
+    /* divider + footer */
+    .div{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:28px 0}
+    .footer{text-align:center;font-size:11px;color:var(--muted2);letter-spacing:.02em}
+
+    @media(max-width:640px){.page{padding:20px 16px 48px}.kpi-val{font-size:20px}}
+  </style>
+</head>
+<body>
+  <div class="gb gb1"></div>
+  <div class="gb gb2"></div>
+
+  <main class="page">
+
+    <!-- TOPBAR -->
+    <header class="topbar u1">
+      <div class="brand">
+        <div class="brand-icon">🏗️</div>
+        <div>
+          <div class="brand-name">Meta Ads <span>Analytics</span></div>
+          <div class="brand-sub">Kampanie budowlane · Q4 2024</div>
+        </div>
+      </div>
+      <div class="topbar-r">
+        <button class="chip" onclick="setPeriod(this)">7d</button>
+        <button class="chip on" onclick="setPeriod(this)">30d</button>
+        <button class="chip" onclick="setPeriod(this)">90d</button>
+        <div class="badge-live"><span class="ldot-live"></span>Night mode</div>
+      </div>
+    </header>
+
+    <!-- KPI -->
+    <div class="slabel u2">Wskaźniki ogólne</div>
+    <div class="kpi-grid u2" id="kpi-grid"></div>
+
+    <!-- ROW 1 -->
+    <div class="g2 u3">
+      <div class="card hc p24">
+        <div class="ch">
+          <div><div class="ch-t">Spending chart</div><div class="ch-s">Skumulowane wartości per kreacja</div></div>
+          <div class="tabs">
+            <button class="tab on"  id="ts" onclick="switchTab('spend')">Spend</button>
+            <button class="tab"     id="tl" onclick="switchTab('leads')">Leady</button>
+          </div>
+        </div>
+        <div class="chart-surf"><div class="cbox"><canvas id="aC"></canvas></div></div>
+      </div>
+
+      <div class="card hp p24">
+        <div class="ch-t" style="margin-bottom:16px">Activity feed</div>
+        <div class="fi"><div class="fi-dot" style="background:#00e0ff;box-shadow:0 0 7px #00e0ff"></div><div><div class="fi-t">Foto Ekipa — top kreacja</div><div class="fi-s">22 leady · CPL 65,94 PLN · dziś</div></div></div>
+        <div class="fi"><div class="fi-dot" style="background:#22d3a0;box-shadow:0 0 7px #22d3a0"></div><div><div class="fi-t">Retargeting — best CPL</div><div class="fi-s">42,00 PLN/lead · 10 leadów</div></div></div>
+        <div class="fi"><div class="fi-dot" style="background:#f59e0b;box-shadow:0 0 7px #f59e0b"></div><div><div class="fi-t">Pompy Ciepła — wysoki budżet</div><div class="fi-s">2 100 PLN spend · CPL 116,67</div></div></div>
+        <div class="fi"><div class="fi-dot" style="background:#f43f5e;box-shadow:0 0 7px #f43f5e"></div><div><div class="fi-t">Wizualizacja Salon — alert</div><div class="fi-s">CPL 205,56 PLN — do optymalizacji</div></div></div>
+        <div class="fi"><div class="fi-dot" style="background:#a855f7;box-shadow:0 0 7px #a855f7"></div><div><div class="fi-t">Elewacje Broad — stabilna</div><div class="fi-s">CPL 78,59 PLN · 14 leadów</div></div></div>
+        <div class="insight">
+          <div class="insight-t">💡 Rekomendacja AI</div>
+          <div class="insight-s">Skaluj Retargeting i Elewacje. Wyłącz Wizualizacja Salon — CPL 5× powyżej benchmarku.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2 -->
+    <div class="g11 u4">
+      <div class="card hp p24">
+        <div class="ch"><div><div class="ch-t">Leady vs. CPL</div><div class="ch-s">Efektywność kreacji · prawa oś = CPL</div></div></div>
+        <div class="cbox2"><canvas id="bC"></canvas></div>
+      </div>
+      <div class="card hc p24">
+        <div class="ch"><div><div class="ch-t">Zasięg vs. Kliknięcia</div><div class="ch-s">Rozmiar bąbelka = liczba leadów</div></div></div>
+        <div class="cbox2"><canvas id="bbC"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card hc p24 u5">
+      <div class="ch">
+        <div><div class="ch-t">Transaction table</div><div class="ch-s">Kliknij nagłówek, aby sortować</div></div>
+        <div class="legend">
+          <span><span class="ld" style="background:#22d3a0;box-shadow:0 0 5px #22d3a0"></span>≤ 70 PLN</span>
+          <span><span class="ld" style="background:#f59e0b;box-shadow:0 0 5px #f59e0b"></span>70–120</span>
+          <span><span class="ld" style="background:#f43f5e;box-shadow:0 0 5px #f43f5e"></span>> 120 PLN</span>
+        </div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Kampania</th><th>Kreacja</th>
+            <th class="s" id="th-leads"  onclick="srt('leads')">Leady <span id="a-leads">⇅</span></th>
+            <th class="s" id="th-ctr"    onclick="srt('ctr')">CTR % <span id="a-ctr">⇅</span></th>
+            <th class="s" id="th-cpc"    onclick="srt('cpc')">CPC <span id="a-cpc">⇅</span></th>
+            <th class="s on" id="th-cpl" onclick="srt('cpl')">CPL <span id="a-cpl">↑</span></th>
+            <th class="s" id="th-spend"  onclick="srt('spend')">Spend <span id="a-spend">⇅</span></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <div class="tfoot-a"><span class="adot"></span>Approved by Ops<span class="atime">02:14</span></div>
+        <div class="tstats">
+          <div><div class="ts-lbl">🏆 Best CPL</div><div class="ts-val" style="color:#22d3a0">42,00 PLN</div></div>
+          <div><div class="ts-lbl">📢 Most Leads</div><div class="ts-val" style="color:#00e0ff">22 · Foto Ekipa</div></div>
+          <div><div class="ts-lbl">⚠️ Worst CPL</div><div class="ts-val" style="color:#f43f5e">205,56 PLN</div></div>
+          <div><div class="ts-lbl">💰 Total Spend</div><div class="ts-val" style="color:#e2e8f2">11 302 PLN</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="div u6"></div>
+    <footer class="footer u6">Meta Ads Analytics · Budowlanka · Q4 2024 · Wygenerowano przez Claude AI</footer>
+  </main>
+
+<script>
+const D=[
+  {c:"Budowa Domów",    ad:"Video Realizacja Modern", reach:15200,clicks:450, spend:1250.00,leads:12,ctr:1.84,cpc:2.78,cpl:104.17},
+  {c:"Budowa Domów",    ad:"Grafika Cena za m2",       reach:8900, clicks:210, spend:840.50, leads:8, ctr:1.71,cpc:4.00,cpl:105.06},
+  {c:"Remonty Łazienek",ad:"Karuzela Przed Po",        reach:12400,clicks:520, spend:920.00, leads:15,ctr:2.80,cpc:1.77,cpl:61.33},
+  {c:"Elewacje",        ad:"Foto Ekipa Przy Pracy",    reach:21000,clicks:840, spend:1450.75,leads:22,ctr:2.62,cpc:1.73,cpl:65.94},
+  {c:"Elewacje",        ad:"Grafika Znizka Jesien",    reach:18500,clicks:610, spend:1100.20,leads:14,ctr:2.10,cpc:1.80,cpl:78.59},
+  {c:"Fundamenty",      ad:"Video Lanie Betonu",       reach:5600, clicks:180, spend:620.00, leads:5, ctr:1.96,cpc:3.44,cpl:124.00},
+  {c:"Wykończenia",     ad:"Wizualizacja Salon",       reach:9800, clicks:310, spend:1850.00,leads:9, ctr:2.01,cpc:5.97,cpl:205.56},
+  {c:"Pompy Ciepła",    ad:"Schemat Oszczednosci",     reach:14200,clicks:480, spend:2100.00,leads:18,ctr:2.17,cpc:4.38,cpl:116.67},
+  {c:"Okna i Drzwi",    ad:"Foto Okna Trzyszybowe",    reach:11000,clicks:290, spend:750.30, leads:7, ctr:1.76,cpc:2.59,cpl:107.19},
+  {c:"Retargeting",     ad:"Oferta Ostatnia Szansa",   reach:3200, clicks:120, spend:420.00, leads:10,ctr:1.54,cpc:3.50,cpl:42.00},
+];
+const NEON=["#00e0ff","#a855f7","#f43f5e","#22d3a0","#f59e0b","#60a5fa","#fb923c","#86efac","#fbbf24","#34d399"];
+const fmt=(n,d=0)=>n.toLocaleString("pl-PL",{minimumFractionDigits:d,maximumFractionDigits:d});
+const cc=v=>v<=70?"#22d3a0":v<=120?"#f59e0b":"#f43f5e";
+
+// KPI
+const tS=D.reduce((a,d)=>a+d.spend,0),tL=D.reduce((a,d)=>a+d.leads,0),tR=D.reduce((a,d)=>a+d.reach,0);
+[
+  {l:"Łączny budżet", v:`${fmt(tS,0)} PLN`, s:"↑ 12% vs poprzedni okres",  c:"#00e0ff",i:"💸",b:.72},
+  {l:"Leady łącznie", v:fmt(tL),             s:`${D.length} aktywnych kreacji`,c:"#a855f7",i:"🎯",b:.60},
+  {l:"Śr. CPL",       v:`${fmt(tS/tL,2)} PLN`,s:"Koszt za lead",            c:"#22d3a0",i:"📊",b:.45},
+  {l:"Łączny zasięg", v:`${fmt(tR/1000,0)}k`, s:"Unikalnych osób",          c:"#f59e0b",i:"👁",b:.80},
+  {l:"Best CPL",      v:"42,00 PLN",          s:"Retargeting · rekordzista", c:"#f43f5e",i:"🏆",b:.95},
+].forEach(k=>document.getElementById('kpi-grid').insertAdjacentHTML('beforeend',
+  `<div class="card kpi p20" data-icon="${k.i}" style="border-left:2px solid ${k.c}28">
+    <div class="kpi-lbl">${k.l}</div>
+    <div class="kpi-val">${k.v}</div>
+    <div class="kpi-track"><div class="kpi-fill" style="width:${k.b*100}%;background:linear-gradient(90deg,${k.c},${k.c}55);box-shadow:0 0 8px ${k.c}70"></div></div>
+    <div class="kpi-sub" style="color:${k.c}">${k.s}</div>
+  </div>`
+));
+
+// Chart defaults
+Chart.defaults.color='rgba(226,232,242,.4)';
+Chart.defaults.font.family="'DM Sans',system-ui,sans-serif";
+Chart.defaults.plugins.legend.display=false;
+const grid={color:'rgba(255,255,255,.05)',drawBorder:false};
+const ticks={color:'rgba(226,232,242,.3)',font:{size:10}};
+const tip={backgroundColor:'rgba(7,9,15,.97)',borderColor:'rgba(0,224,255,.3)',borderWidth:1,titleColor:'#00e0ff',titleFont:{size:11,weight:'700'},bodyColor:'rgba(226,232,242,.75)',padding:12,cornerRadius:10};
+
+// Area
+let acc=0;
+const aLbls=D.map(d=>d.ad.split(" ")[0]);
+const sAcc=D.map(d=>parseFloat((acc+=d.spend).toFixed(2)));
+const lArr=D.map(d=>d.leads);
+const aCtx=document.getElementById('aC').getContext('2d');
+const gC=aCtx.createLinearGradient(0,0,0,220);gC.addColorStop(0,'rgba(0,224,255,.28)');gC.addColorStop(1,'rgba(0,224,255,0)');
+const gP=aCtx.createLinearGradient(0,0,0,220);gP.addColorStop(0,'rgba(168,85,247,.28)');gP.addColorStop(1,'rgba(168,85,247,0)');
+const aC=new Chart(aCtx,{type:'line',data:{labels:aLbls,datasets:[{data:sAcc,borderColor:'#00e0ff',borderWidth:2.5,backgroundColor:gC,fill:true,tension:.4,pointBackgroundColor:'#00e0ff',pointRadius:3,pointHoverRadius:7,pointBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks,border:{display:false}},y:{grid,ticks,border:{display:false}}},plugins:{tooltip:{...tip,callbacks:{label:c=>' '+fmt(c.parsed.y,c.parsed.y<100?2:0)+' PLN'}}}}});
+
+function switchTab(t){
+  document.getElementById('ts').className='tab '+(t==='spend'?'on':'');
+  document.getElementById('tl').className='tab '+(t==='leads'?'on':'');
+  const ds=aC.data.datasets[0];
+  t==='spend'?(ds.data=sAcc,ds.borderColor='#00e0ff',ds.backgroundColor=gC,ds.pointBackgroundColor='#00e0ff'):(ds.data=lArr,ds.borderColor='#a855f7',ds.backgroundColor=gP,ds.pointBackgroundColor='#a855f7');
+  aC.update();
+}
+
+// Bar
+new Chart(document.getElementById('bC').getContext('2d'),{type:'bar',data:{labels:D.map(d=>d.ad.length>13?d.ad.slice(0,12)+'…':d.ad),datasets:[{label:'Leady',data:D.map(d=>d.leads),backgroundColor:NEON.map(c=>c+'cc'),borderRadius:5,yAxisID:'y'},{label:'CPL (PLN)',data:D.map(d=>d.cpl),backgroundColor:'rgba(168,85,247,.22)',borderColor:'rgba(168,85,247,.5)',borderWidth:1,borderRadius:5,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,maxRotation:40,font:{size:9}},border:{display:false}},y:{grid,ticks,border:{display:false},position:'left'},y1:{grid:{display:false},ticks,border:{display:false},position:'right'}},plugins:{legend:{display:true,labels:{color:'rgba(226,232,242,.4)',font:{size:11},boxWidth:12,padding:16}},tooltip:tip}}});
+
+// Bubble
+new Chart(document.getElementById('bbC').getContext('2d'),{type:'bubble',data:{datasets:[{label:'Kreacje',data:D.map((d,i)=>({x:d.reach,y:d.clicks,r:Math.sqrt(d.leads)*4.2,ad:d.ad,leads:d.leads})),backgroundColor:D.map((_,i)=>NEON[i]+'50'),borderColor:D.map((_,i)=>NEON[i]),borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid,ticks:{...ticks,callback:v=>`${(v/1000).toFixed(0)}k`},border:{display:false},title:{display:true,text:'Zasięg',color:'rgba(226,232,242,.3)',font:{size:10}}},y:{grid,ticks,border:{display:false},title:{display:true,text:'Kliknięcia',color:'rgba(226,232,242,.3)',font:{size:10}}}},plugins:{tooltip:{...tip,callbacks:{title:i=>i[0].raw.ad,label:i=>[` Zasięg: ${fmt(i.raw.x)}`,` Kliknięcia: ${fmt(i.raw.y)}`,` Leady: ${i.raw.leads}`]}}}}});
+
+// Table
+let sK='cpl',sD='asc';
+function srt(k){
+  if(k===sK)sD=sD==='asc'?'desc':'asc';else{sK=k;sD='asc';}
+  ['leads','ctr','cpc','cpl','spend'].forEach(x=>{
+    document.getElementById('th-'+x).classList.toggle('on',x===sK);
+    document.getElementById('a-'+x).textContent=x===sK?(sD==='asc'?'↑':'↓'):'⇅';
+  });
+  renderT();
+}
+function renderT(){
+  document.getElementById('tbody').innerHTML=[...D].sort((a,b)=>sD==='asc'?a[sK]-b[sK]:b[sK]-a[sK]).map((d,i)=>{
+    const col=cc(d.cpl);
+    return `<tr>
+      <td class="mono" style="color:var(--muted2)">${String(i+1).padStart(2,'0')}</td>
+      <td style="color:var(--muted);white-space:nowrap;font-size:11px">${d.c}</td>
+      <td><span class="tag">${d.ad}</span></td>
+      <td style="font-weight:600">${d.leads}</td>
+      <td style="color:${d.ctr>=2.5?'#22d3a0':'inherit'};font-weight:${d.ctr>=2.5?600:400}">${d.ctr.toFixed(2)}%</td>
+      <td class="mono" style="color:${d.cpc<=2?'#22d3a0':d.cpc>=5?'#f43f5e':'inherit'}">${d.cpc.toFixed(2)}</td>
+      <td><span class="pill" style="background:${col}15;color:${col};border:1px solid ${col}30">${d.cpl.toFixed(2)}</span></td>
+      <td class="mono" style="color:var(--muted)">${d.spend.toFixed(0)}</td>
+    </tr>`;
+  }).join('');
+}
+renderT();
+
+function setPeriod(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+</script>
+</body>
+</html>
